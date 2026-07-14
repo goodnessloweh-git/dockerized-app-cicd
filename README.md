@@ -71,3 +71,4 @@ Point [UptimeRobot](https://uptimerobot.com/) or Healthchecks at `https://<your-
 ## License
 
 MIT
+
