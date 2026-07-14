@@ -61,7 +61,15 @@ jobs:
           docker tag "$IMAGE:${{ github.sha }}" "$IMAGE:latest"
           docker push "$IMAGE:${{ github.sha }}"
           docker push "$IMAGE:latest"
-          # Keyless signing with the GitHub OIDC token (no stored keys).
+deploy:
+    needs: build-scan-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "Triggered deploy for ${{ env.IMAGE }}:${{ github.sha           # Keyless signing with the GitHub OIDC token (no stored keys).
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE:${{ github.sha }}")
           cosign sign --yes "$DIGEST"
 
@@ -70,7 +78,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Render deploy
+      - name: Deploy
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
-          echo "Triggered deploy for ${{ env.IMAGE }}:${{ github.sha }}"
+          echo "Deploy ${{ env.IMAGE }}:${{ github.sha }} to your host (Render/Fly/K8s)."
+          echo "Wire this step to your platform; image is published + signed in GHCR."
